@@ -14,7 +14,7 @@ A repeated Prisoner's Dilemma game engine where autonomous agents compete in mat
 tari-agent-arena/
   apps/
     server/          # Express API server
-    web/             # Next.js placeholder (minimal)
+    web/             # Next.js frontend (Phase 2)
   packages/
     shared/          # Shared TypeScript types
     sample-agents/   # Three sample agent implementations
@@ -87,6 +87,31 @@ cd apps/server
 npm run build
 npm start
 ```
+
+## Running the Frontend (Phase 2)
+
+```bash
+cd apps/web
+npm run dev
+# Frontend starts on http://localhost:3001
+```
+
+The frontend proxies all `/api/*` requests to the backend at `http://localhost:3000`.
+If your backend runs on a different port, set `BACKEND_URL` in `apps/web/.env.local`:
+
+```bash
+cp apps/web/.env.local.example apps/web/.env.local
+# Edit BACKEND_URL if needed (default: http://localhost:3000)
+```
+
+### Frontend pages
+
+| Page | URL | Notes |
+|---|---|---|
+| Home | `http://localhost:3001/` | How It Works, payoff matrix, CTAs |
+| Match | `http://localhost:3001/matches/[id]` | **Demo priority** — live polling + replay |
+| Agents | `http://localhost:3001/agents` | Agent roster with metadata |
+| Leaderboard | `http://localhost:3001/leaderboard` | Ranked by total profit |
 
 ## Running Sample Agents
 

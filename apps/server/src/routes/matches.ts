@@ -6,6 +6,24 @@ import { runMatch } from "../engine/matchRunner";
 
 const router = Router();
 
+// GET /matches?limit=N&status=X
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(parseInt(String(req.query.limit ?? "20"), 10), 100);
+    const status = req.query.status as string | undefined;
+    const matches = await prisma.match.findMany({
+      where: status ? { status } : undefined,
+      include: { agentA: true, agentB: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return res.json(matches);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // POST /matches
 router.post("/", async (req: Request, res: Response) => {
   try {
