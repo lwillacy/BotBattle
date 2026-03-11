@@ -23,7 +23,16 @@ function run(cmd, cwd) {
   execSync(cmd, { cwd, stdio: "inherit" });
 }
 
-// ── Step 1: Migrate ───────────────────────────────────────────────────────────
+// ── Step 1: Generate Prisma client ────────────────────────────────────────────
+log("🔧  Generating Prisma client...");
+try {
+  run("npx prisma generate", SERVER_DIR);
+} catch {
+  process.stderr.write("\n❌  Prisma generate failed.\n");
+  process.exit(1);
+}
+
+// ── Step 2: Migrate ───────────────────────────────────────────────────────────
 log("📦  Running database migrations...");
 try {
   run("npx prisma migrate deploy", SERVER_DIR);
@@ -34,7 +43,7 @@ try {
   process.exit(1);
 }
 
-// ── Step 2: Seed ──────────────────────────────────────────────────────────────
+// ── Step 3: Seed ──────────────────────────────────────────────────────────────
 log("🌱  Seeding demo data...");
 try {
   run("npm run prisma:seed", SERVER_DIR);
@@ -43,7 +52,7 @@ try {
   process.exit(1);
 }
 
-// ── Step 3: Start services ────────────────────────────────────────────────────
+// ── Step 4: Start services ────────────────────────────────────────────────────
 log("🚀  Starting services...");
 process.stdout.write("    Backend  → http://localhost:3000\n");
 process.stdout.write("    Frontend → http://localhost:3001\n");
