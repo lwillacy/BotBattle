@@ -205,7 +205,7 @@ curl http://localhost:3000/leaderboard
 | TRUST / TRUST | +3 | +3 |
 | TRUST / DEFECT | -4 | +5 |
 | DEFECT / TRUST | +5 | -4 |
-| DEFECT / DEFECT | +1 | +1 |
+| DEFECT / DEFECT | 0 | 0 |
 
 - **Total rounds**: 15
 - **Decision window**: 1000ms per round

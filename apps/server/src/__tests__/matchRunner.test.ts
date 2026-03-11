@@ -71,7 +71,7 @@ describe("matchRunner logic (unit tests for orchestration components)", () => {
     expect(typeof scoreB).toBe("number");
   });
 
-  test("DEFECT/DEFECT all rounds: both get low positive scores", () => {
+  test("DEFECT/DEFECT all rounds: scores come only from initiator bonus", () => {
     let scoreA = 0;
     let scoreB = 0;
     const initiatorBonus = rules.initiatorBonus;
@@ -83,11 +83,11 @@ describe("matchRunner logic (unit tests for orchestration components)", () => {
       scoreB += payoffB + (initiator === "B" ? initiatorBonus : 0);
     }
 
-    // Both get 1 per round + initiator bonus
-    // A: 15 * 1 + 8 * 2 = 15 + 16 = 31
-    // B: 15 * 1 + 7 * 2 = 15 + 14 = 29
-    expect(scoreA).toBe(31);
-    expect(scoreB).toBe(29);
+    // D/D payoff is 0/0, so scores come only from initiator bonuses
+    // A initiates rounds 1,3,5,7,9,11,13,15 = 8 rounds => 8 * 2 = 16
+    // B initiates rounds 2,4,6,8,10,12,14   = 7 rounds => 7 * 2 = 14
+    expect(scoreA).toBe(16);
+    expect(scoreB).toBe(14);
     expect(scoreA).toBeGreaterThan(scoreB);
   });
 });

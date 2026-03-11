@@ -10,7 +10,7 @@ export const trustDefectV1: GameRules = {
     trustTrust: { a: 3, b: 3 },
     trustDefect: { a: -4, b: 5 },
     defectTrust: { a: 5, b: -4 },
-    defectDefect: { a: 1, b: 1 },
+    defectDefect: { a: 0, b: 0 },
   },
   defaultActionOnTimeout: "DEFECT",
 };

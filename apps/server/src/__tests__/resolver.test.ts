@@ -22,9 +22,9 @@ describe("resolvePayoffs", () => {
     expect(result.payoffB).toBe(-4);
   });
 
-  test("DEFECT vs DEFECT: both get 1", () => {
+  test("DEFECT vs DEFECT: both get 0", () => {
     const result = resolvePayoffs("DEFECT", "DEFECT", rules);
-    expect(result.payoffA).toBe(1);
-    expect(result.payoffB).toBe(1);
+    expect(result.payoffA).toBe(0);
+    expect(result.payoffB).toBe(0);
   });
 });

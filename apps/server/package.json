@@ -10,7 +10,8 @@
     "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "simulate": "ts-node src/simulate.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.8.0",
