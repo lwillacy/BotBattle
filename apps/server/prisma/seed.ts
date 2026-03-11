@@ -239,20 +239,22 @@ async function createSimulatedMatch(params: SimulatedMatchParams) {
       },
     });
 
-    // Initiator bonus ledger entry
-    const initiatorAgentId = initiator === "A" ? params.agentAId : params.agentBId;
-    const initiatorOwnerId = initiator === "A" ? params.ownerAId : params.ownerBId;
-    await prisma.ledgerEntry.create({
-      data: {
-        ownerId: initiatorOwnerId,
-        agentId: initiatorAgentId,
-        matchId: match.id,
-        roundId: round.id,
-        type: "initiator_bonus",
-        amount: initiatorBonus,
-        assetSymbol: "TARI",
-      },
-    });
+    // Initiator bonus ledger entry — only create if bonus is non-zero
+    if (initiatorBonus > 0) {
+      const initiatorAgentId = initiator === "A" ? params.agentAId : params.agentBId;
+      const initiatorOwnerId = initiator === "A" ? params.ownerAId : params.ownerBId;
+      await prisma.ledgerEntry.create({
+        data: {
+          ownerId: initiatorOwnerId,
+          agentId: initiatorAgentId,
+          matchId: match.id,
+          roundId: round.id,
+          type: "initiator_bonus",
+          amount: initiatorBonus,
+          assetSymbol: "TARI",
+        },
+      });
+    }
 
     // Round payoff entries
     await prisma.ledgerEntry.createMany({

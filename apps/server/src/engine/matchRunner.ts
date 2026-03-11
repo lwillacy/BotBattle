@@ -4,7 +4,6 @@ import { getRules } from "./rules/registry";
 import { resolvePayoffs, getInitiatorForRound } from "./resolver";
 import { callAgent } from "../agents/agentCaller";
 import {
-  createInitiatorBonusEntry,
   createRoundPayoffEntries,
   createPrizePayoutEntry,
   createStakeRefundEntries,
@@ -63,22 +62,8 @@ export async function runMatch(matchId: string): Promise<void> {
         },
       });
 
-      // Create initiator bonus ledger entry
-      const initiatorAgentId =
-        initiator === "A" ? match.agentAId : match.agentBId;
-      const initiatorOwnerId =
-        initiator === "A" ? match.agentA.ownerId : match.agentB.ownerId;
-
-      await createInitiatorBonusEntry(
-        matchId,
-        round.id,
-        initiatorAgentId,
-        initiatorOwnerId,
-        initiatorBonus
-      );
-
-      // Apply initiator bonus to scores before agents decide so they reason
-      // from the correct post-bonus state (spec: bonus applied before decisions)
+      // Scores passed to agents reflect the current cumulative totals.
+      // initiatorBonus is 0 in trust-defect-v1; kept for forward compatibility.
       const scoreAWithBonus = scoreA + (initiator === "A" ? initiatorBonus : 0);
       const scoreBWithBonus = scoreB + (initiator === "B" ? initiatorBonus : 0);
 

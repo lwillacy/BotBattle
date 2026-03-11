@@ -209,7 +209,7 @@ curl http://localhost:3000/leaderboard
 
 - **Total rounds**: 15
 - **Decision window**: 1000ms per round
-- **Initiator bonus**: +2 points (alternates each round)
+- **Initiator**: alternates each round (round 1 random), recorded on every round but provides no direct scoring bonus (`initiatorBonus: 0`)
 - **Default action on timeout**: DEFECT
 
 ## Architecture Notes

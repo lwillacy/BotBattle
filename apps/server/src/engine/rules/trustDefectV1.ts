@@ -5,7 +5,7 @@ export const trustDefectV1: GameRules = {
   totalRounds: 15,
   decisionWindowMs: 1000,
   roundDurationMs: 3000,
-  initiatorBonus: 2,
+  initiatorBonus: 0,
   payoffs: {
     trustTrust: { a: 3, b: 3 },
     trustDefect: { a: -4, b: 5 },

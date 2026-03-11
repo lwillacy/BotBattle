@@ -39,16 +39,13 @@ describe("matchRunner logic (unit tests for orchestration components)", () => {
       scoreB += payoffB + bonusB;
     }
 
-    // A always gets -4 per round (TRUST vs DEFECT)
-    // B always gets 5 per round
-    // Initiator bonus: 8 rounds A is initiator (rounds 1,3,5,7,9,11,13,15) = 8 * 2 = 16
-    // 7 rounds B is initiator = 7 * 2 = 14
+    // A always gets -4 per round (TRUST vs DEFECT) => -60 total
+    // B always gets 5 per round => 75 total
+    // initiatorBonus is 0, so no bonus adjustment
     const expectedBaseA = 15 * (-4); // -60
     const expectedBaseB = 15 * 5; // 75
-    const aInitiatorRounds = 8; // rounds 1,3,5,7,9,11,13,15
-    const bInitiatorRounds = 7;
-    expect(scoreA).toBe(expectedBaseA + aInitiatorRounds * initiatorBonus);
-    expect(scoreB).toBe(expectedBaseB + bInitiatorRounds * initiatorBonus);
+    expect(scoreA).toBe(expectedBaseA); // -60
+    expect(scoreB).toBe(expectedBaseB); // 75
   });
 
   test("tie-breaking: equal scores produce no winner", () => {
@@ -64,14 +61,12 @@ describe("matchRunner logic (unit tests for orchestration components)", () => {
       scoreB += payoffB + (initiator === "B" ? initiatorBonus : 0);
     }
 
-    // With TRUST/TRUST, both get 3 per round + initiator bonus
-    // A gets bonus 8 rounds, B gets bonus 7 rounds
-    // Not a tie in this case
-    expect(typeof scoreA).toBe("number");
-    expect(typeof scoreB).toBe("number");
+    // With TRUST/TRUST and initiatorBonus=0, both get 3*15=45 — a true tie
+    expect(scoreA).toBe(45);
+    expect(scoreB).toBe(45);
   });
 
-  test("DEFECT/DEFECT all rounds: scores come only from initiator bonus", () => {
+  test("DEFECT/DEFECT all rounds: both score 0 (0/0 payoff, 0 bonus)", () => {
     let scoreA = 0;
     let scoreB = 0;
     const initiatorBonus = rules.initiatorBonus;
@@ -83,11 +78,8 @@ describe("matchRunner logic (unit tests for orchestration components)", () => {
       scoreB += payoffB + (initiator === "B" ? initiatorBonus : 0);
     }
 
-    // D/D payoff is 0/0, so scores come only from initiator bonuses
-    // A initiates rounds 1,3,5,7,9,11,13,15 = 8 rounds => 8 * 2 = 16
-    // B initiates rounds 2,4,6,8,10,12,14   = 7 rounds => 7 * 2 = 14
-    expect(scoreA).toBe(16);
-    expect(scoreB).toBe(14);
-    expect(scoreA).toBeGreaterThan(scoreB);
+    // D/D payoff is 0/0 and initiatorBonus is 0 — both agents end at exactly 0
+    expect(scoreA).toBe(0);
+    expect(scoreB).toBe(0);
   });
 });
