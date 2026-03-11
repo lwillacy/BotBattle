@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AgentOwner {
+  id          String   @id @default(cuid())
+  displayName String
+  walletAddress String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agents      Agent[]
+  ledgerEntries LedgerEntry[]
+}
+
+model Agent {
+  id                     String   @id @default(cuid())
+  ownerId                String
+  name                   String
+  avatarUrl              String?
+  endpointUrl            String?
+  status                 String   @default("pending")
+  minStake               Float
+  maxStake               Float
+  defaultActionOnTimeout String   @default("DEFECT")
+  metadata               Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  owner         AgentOwner @relation(fields: [ownerId], references: [id])
+  matchesAsA    Match[]    @relation("AgentA")
+  matchesAsB    Match[]    @relation("AgentB")
+  wonMatches    Match[]    @relation("Winner")
+  roundDecisions RoundDecision[]
+  ledgerEntries  LedgerEntry[]
+}
+
+model Match {
+  id                 String    @id @default(cuid())
+  agentAId           String
+  agentBId           String
+  stakePerAgent      Float
+  prizePool          Float
+  rulesVersion       String
+  rulesSnapshot      Json
+  rulesHash          String
+  initialInitiator   String
+  currentRoundNumber Int       @default(0)
+  scoreA             Float     @default(0)
+  scoreB             Float     @default(0)
+  status             String    @default("pending")
+  winnerAgentId      String?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  agentA        Agent   @relation("AgentA", fields: [agentAId], references: [id])
+  agentB        Agent   @relation("AgentB", fields: [agentBId], references: [id])
+  winner        Agent?  @relation("Winner", fields: [winnerAgentId], references: [id])
+  rounds        Round[]
+  ledgerEntries LedgerEntry[]
+}
+
+model Round {
+  id                String    @id @default(cuid())
+  matchId           String
+  roundNumber       Int
+  initiator         String
+  initiatorBonus    Float
+  actionA           String?
+  actionB           String?
+  actionSourceA     String?
+  actionSourceB     String?
+  payoffA           Float     @default(0)
+  payoffB           Float     @default(0)
+  scoreAAfter       Float     @default(0)
+  scoreBAfter       Float     @default(0)
+  startedAt         DateTime
+  decisionDeadlineAt DateTime
+  resolvedAt        DateTime?
+
+  match      Match           @relation(fields: [matchId], references: [id])
+  decisions  RoundDecision[]
+  ledgerEntries LedgerEntry[]
+}
+
+model RoundDecision {
+  id                  String    @id @default(cuid())
+  roundId             String
+  agentId             String
+  requestPreparedAt   DateTime?
+  requestSentAt       DateTime?
+  responseReceivedAt  DateTime?
+  timedOutAt          DateTime?
+  latencyMs           Int?
+  deadlineMs          Int
+  action              String?
+  rawRequest          Json?
+  rawResponse         Json?
+  outcome             String
+  errorMessage        String?
+  createdAt           DateTime  @default(now())
+
+  round Round @relation(fields: [roundId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id])
+}
+
+model LedgerEntry {
+  id           String   @id @default(cuid())
+  ownerId      String?
+  agentId      String?
+  matchId      String?
+  roundId      String?
+  type         String
+  amount       Float
+  balanceAfter Float?
+  assetSymbol  String
+  txHash       String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  owner  AgentOwner? @relation(fields: [ownerId], references: [id])
+  agent  Agent?      @relation(fields: [agentId], references: [id])
+  match  Match?      @relation(fields: [matchId], references: [id])
+  round  Round?      @relation(fields: [roundId], references: [id])
+}
