@@ -32,13 +32,13 @@ try {
   process.exit(1);
 }
 
-// ── Step 2: Migrate ───────────────────────────────────────────────────────────
-log("📦  Running database migrations...");
+// ── Step 2: Push schema to DB ─────────────────────────────────────────────────
+log("📦  Pushing database schema...");
 try {
-  run("npx prisma migrate deploy", SERVER_DIR);
+  run("npx prisma db push --accept-data-loss", SERVER_DIR);
 } catch {
   process.stderr.write(
-    "\n❌  Migration failed. Is DATABASE_URL set in apps/server/.env?\n"
+    "\n❌  Schema push failed. Is DATABASE_URL set in apps/server/.env?\n"
   );
   process.exit(1);
 }
