@@ -77,6 +77,11 @@ export async function runMatch(matchId: string): Promise<void> {
         initiatorBonus
       );
 
+      // Apply initiator bonus to scores before agents decide so they reason
+      // from the correct post-bonus state (spec: bonus applied before decisions)
+      const scoreAWithBonus = scoreA + (initiator === "A" ? initiatorBonus : 0);
+      const scoreBWithBonus = scoreB + (initiator === "B" ? initiatorBonus : 0);
+
       // Build payloads
       const payloadA: AgentDecisionPayload = {
         matchId,
@@ -86,7 +91,7 @@ export async function runMatch(matchId: string): Promise<void> {
         initiator,
         initiatorBonus,
         decisionDeadlineMs: rules.decisionWindowMs,
-        score: { you: scoreA, opponent: scoreB },
+        score: { you: scoreAWithBonus, opponent: scoreBWithBonus },
         history: historyA,
         rulesVersion: rules.version,
       };
@@ -99,7 +104,7 @@ export async function runMatch(matchId: string): Promise<void> {
         initiator,
         initiatorBonus,
         decisionDeadlineMs: rules.decisionWindowMs,
-        score: { you: scoreB, opponent: scoreA },
+        score: { you: scoreBWithBonus, opponent: scoreAWithBonus },
         history: historyB,
         rulesVersion: rules.version,
       };

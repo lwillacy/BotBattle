@@ -59,7 +59,8 @@ router.post("/", async (req: Request, res: Response) => {
       return res.status(400).json({ error: `Unknown rules version: ${rulesVersion}` });
     }
 
-    const rulesSnapshot = rules as unknown as object;
+    // Deep copy so stored snapshot is not a reference to the registry singleton
+    const rulesSnapshot = JSON.parse(JSON.stringify(rules)) as object;
     const rulesHash = hashRules(rules);
     const prizePool = stake * 2;
 
