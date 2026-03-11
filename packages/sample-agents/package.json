@@ -1,0 +1,23 @@
+{
+  "name": "@tari-agent-arena/sample-agents",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start:trusting": "ts-node src/trusting-agent.ts",
+    "start:opportunist": "ts-node src/opportunist-agent.ts",
+    "start:tit-for-tat": "ts-node src/tit-for-tat-agent.ts",
+    "start:all": "concurrently \"npm run start:trusting\" \"npm run start:opportunist\" \"npm run start:tit-for-tat\""
+  },
+  "dependencies": {
+    "@tari-agent-arena/shared": "*",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.6",
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
