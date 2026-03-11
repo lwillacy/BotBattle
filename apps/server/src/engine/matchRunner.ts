@@ -9,7 +9,7 @@ import {
   createStakeRefundEntries,
 } from "../ledger/ledgerService";
 
-export async function runMatch(matchId: string): Promise<void> {
+export async function runMatch(matchId: string, options?: { delayBetweenRoundsMs?: number }): Promise<void> {
   // Load match with agents
   const match = await prisma.match.findUnique({
     where: { id: matchId },
@@ -217,6 +217,10 @@ export async function runMatch(matchId: string): Promise<void> {
         opponentPayoff: finalPayoffA,
         initiator,
       });
+
+      if (options?.delayBetweenRoundsMs && roundNumber < rules.totalRounds) {
+        await new Promise((resolve) => setTimeout(resolve, options.delayBetweenRoundsMs));
+      }
     }
 
     // Determine winner

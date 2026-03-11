@@ -122,10 +122,12 @@ router.post("/run", async (_req: Request, res: Response) => {
       agentB.ownerId
     );
 
-    // Run synchronously — in-process agents complete in milliseconds
-    await runMatch(match.id);
-
-    return res.json({ matchId: match.id });
+    // Return immediately so the browser can navigate to the live match page,
+    // then run rounds with a 1-second delay so the user can watch them play out.
+    res.json({ matchId: match.id });
+    runMatch(match.id, { delayBetweenRoundsMs: 1000 }).catch((err) => {
+      console.error("[demo/run] match runner error:", err);
+    });
   } catch (err) {
     console.error("[demo/run]", err);
     return res.status(500).json({ error: String(err) });
