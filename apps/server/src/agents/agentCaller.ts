@@ -4,6 +4,7 @@ import {
   AgentDecisionResponse,
   DecisionOutcome,
 } from "@tari-agent-arena/shared";
+import { isInProcessAgent, callInProcessAgent } from "./inProcessAgents";
 
 export interface RoundDecisionRecord {
   agentId: string;
@@ -33,6 +34,31 @@ export async function callAgent(
   payload: AgentDecisionPayload,
   defaultAction: Action
 ): Promise<AgentCallResult> {
+  // ── In-process shortcut for demo:// agents ──────────────────────────────────
+  if (isInProcessAgent(endpointUrl)) {
+    const now = new Date();
+    const action = callInProcessAgent(endpointUrl, payload);
+    return {
+      decision: {
+        agentId,
+        roundId,
+        requestPreparedAt: now,
+        requestSentAt: now,
+        responseReceivedAt: now,
+        timedOutAt: null,
+        latencyMs: 0,
+        deadlineMs: payload.decisionDeadlineMs,
+        action,
+        rawRequest: payload as unknown as object,
+        rawResponse: { action } as object,
+        outcome: "submitted",
+        errorMessage: null,
+      },
+      action,
+    };
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
   const deadlineMs = payload.decisionDeadlineMs;
 
   const record: RoundDecisionRecord = {

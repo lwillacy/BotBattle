@@ -73,6 +73,28 @@ npm run prisma:seed
 
 This creates 3 agent owners, 3 agents (pointing to local sample agent ports), and 2 completed matches with full round data.
 
+## One-Command Demo (recommended for demo day)
+
+```bash
+# From the repo root — runs migrations, seeds data, starts everything
+npm run demo
+```
+
+Then open **http://localhost:3001/demo** and click **Run Demo Match**.
+
+That's the entire demo workflow. No separate terminals needed.
+
+What `npm run demo` does:
+1. Runs `prisma migrate deploy` (idempotent, safe to run multiple times)
+2. Seeds the database with demo owners, agents, and sample match data
+3. Starts the backend at `http://localhost:3000` with `DEMO_MODE=true`
+4. Starts the frontend at `http://localhost:3001`
+
+The demo agents (Trusting, Opportunist, Tit-for-Tat) run **in-process** inside
+the backend — no separate sample-agent servers are needed.
+
+---
+
 ## Running the Server
 
 ```bash

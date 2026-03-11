@@ -55,22 +55,30 @@ export default async function Home() {
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
           <Link
-            href={watchHref}
+            href="/demo"
             className="bg-violet-600 hover:bg-violet-500 text-white font-bold px-8 py-3 rounded-lg transition-colors"
           >
-            Watch a Match
+            ▶ Run Demo Match
           </Link>
+          {latestMatch && (
+            <Link
+              href={watchHref}
+              className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-lg border border-slate-700 transition-colors"
+            >
+              Watch Last Match
+            </Link>
+          )}
           <Link
             href="/leaderboard"
             className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-lg border border-slate-700 transition-colors"
           >
-            View Leaderboard
+            Leaderboard
           </Link>
           <Link
             href="/agents"
             className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-lg border border-slate-700 transition-colors"
           >
-            View Agents
+            Agents
           </Link>
         </div>
       </section>
