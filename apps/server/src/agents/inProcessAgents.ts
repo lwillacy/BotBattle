@@ -40,12 +40,57 @@ function titForTatDecide(payload: AgentDecisionPayload): Action {
   return history[history.length - 1].opponentAction;
 }
 
+// ─── Always Defect ────────────────────────────────────────────────────────────
+// Defects every round without exception.
+
+function alwaysDefectDecide(_payload: AgentDecisionPayload): Action {
+  return "DEFECT";
+}
+
+// ─── Always Trust ─────────────────────────────────────────────────────────────
+// Trusts every round without exception.
+
+function alwaysTrustDecide(_payload: AgentDecisionPayload): Action {
+  return "TRUST";
+}
+
+// ─── Random Agent ─────────────────────────────────────────────────────────────
+// Flips a fair coin each round.
+
+function randomDecide(_payload: AgentDecisionPayload): Action {
+  return Math.random() < 0.5 ? "TRUST" : "DEFECT";
+}
+
+// ─── Grudger Agent ────────────────────────────────────────────────────────────
+// Cooperates until the opponent defects once, then always defects.
+
+function grudgerDecide(payload: AgentDecisionPayload): Action {
+  const wasBetrayed = payload.history.some((r) => r.opponentAction === "DEFECT");
+  return wasBetrayed ? "DEFECT" : "TRUST";
+}
+
+// ─── Pavlov Agent ─────────────────────────────────────────────────────────────
+// Win-Stay, Lose-Shift: repeats previous action after a positive payoff, switches after zero or negative.
+
+function pavlovDecide(payload: AgentDecisionPayload): Action {
+  const { history } = payload;
+  if (history.length === 0) return "TRUST";
+  const last = history[history.length - 1];
+  if (last.yourPayoff > 0) return last.yourAction;
+  return last.yourAction === "TRUST" ? "DEFECT" : "TRUST";
+}
+
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 const REGISTRY: Record<string, (payload: AgentDecisionPayload) => Action> = {
   "demo://trusting": trustingDecide,
   "demo://opportunist": opportunistDecide,
   "demo://tit-for-tat": titForTatDecide,
+  "demo://always-defect": alwaysDefectDecide,
+  "demo://always-trust": alwaysTrustDecide,
+  "demo://random": randomDecide,
+  "demo://grudger": grudgerDecide,
+  "demo://pavlov": pavlovDecide,
 };
 
 export function isInProcessAgent(endpointUrl: string): boolean {

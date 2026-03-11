@@ -27,7 +27,32 @@ const DEMO_AGENT_DEFS = [
     name: "Tit-for-Tat Agent",
     metadata: { description: "Mirrors the opponent's previous action", strategy: "tit-for-tat" },
   },
-] as const;
+  {
+    endpointUrl: "demo://always-defect",
+    name: "Always Defect",
+    metadata: { description: "Defects every round without exception", strategy: "always-defect" },
+  },
+  {
+    endpointUrl: "demo://always-trust",
+    name: "Always Trust",
+    metadata: { description: "Trusts every round without exception", strategy: "always-trust" },
+  },
+  {
+    endpointUrl: "demo://random",
+    name: "Random Agent",
+    metadata: { description: "Flips a fair coin each round", strategy: "random" },
+  },
+  {
+    endpointUrl: "demo://grudger",
+    name: "Grudger Agent",
+    metadata: { description: "Cooperates until first betrayal, then always defects", strategy: "grudger" },
+  },
+  {
+    endpointUrl: "demo://pavlov",
+    name: "Pavlov Agent",
+    metadata: { description: "Win-Stay Lose-Shift: repeats winning moves, switches after losing ones", strategy: "pavlov" },
+  },
+];
 
 const DEMO_OWNER_DISPLAY_NAME = "Demo";
 const DEMO_STAKE = 10;
@@ -78,21 +103,44 @@ async function ensureDemoAgents() {
   });
 }
 
+// ── GET /demo/agents ──────────────────────────────────────────────────────────
+// Return the list of available demo agent strategies.
+
+router.get("/agents", (_req: Request, res: Response) => {
+  return res.json(DEMO_AGENT_DEFS.map((d) => d.metadata));
+});
+
 // ── POST /demo/run ────────────────────────────────────────────────────────────
 // Ensure demo agents exist, create a match between two of them, run it,
 // and return the matchId. With in-process agents this completes in < 1 second.
+// Accepts optional body: { agentAStrategy, agentBStrategy } to pick specific agents.
 
-router.post("/run", async (_req: Request, res: Response) => {
+router.post("/run", async (req: Request, res: Response) => {
   try {
     const agents = await ensureDemoAgents();
     if (agents.length < 2) {
       return res.status(500).json({ error: "Could not ensure demo agents" });
     }
 
-    // Shuffle and pick two different agents for variety
-    const shuffled = [...agents].sort(() => Math.random() - 0.5);
-    const agentA = shuffled[0];
-    const agentB = shuffled[1];
+    const { agentAStrategy, agentBStrategy } = (req.body ?? {}) as {
+      agentAStrategy?: string;
+      agentBStrategy?: string;
+    };
+
+    let agentA, agentB;
+
+    if (agentAStrategy && agentBStrategy) {
+      agentA = agents.find((a) => a.endpointUrl === `demo://${agentAStrategy}`);
+      agentB = agents.find((a) => a.endpointUrl === `demo://${agentBStrategy}`);
+      if (!agentA || !agentB) {
+        return res.status(400).json({ error: "Unknown agent strategy specified" });
+      }
+    } else {
+      // Shuffle and pick two different agents for variety
+      const shuffled = [...agents].sort(() => Math.random() - 0.5);
+      agentA = shuffled[0];
+      agentB = shuffled[1];
+    }
 
     const rules = getRules(RULES_VERSION);
     const rulesSnapshot = JSON.parse(JSON.stringify(rules)) as object;
